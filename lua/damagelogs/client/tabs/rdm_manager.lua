@@ -64,7 +64,8 @@ end)
 local status = {
     [RDM_MANAGER_WAITING] = TTTLogTranslate(GetDMGLogLang, "RDMWaiting"),
     [RDM_MANAGER_PROGRESS] = TTTLogTranslate(GetDMGLogLang, "RDMInProgress"),
-    [RDM_MANAGER_FINISHED] = TTTLogTranslate(GetDMGLogLang, "RDMFinished")
+    [RDM_MANAGER_FINISHED] = TTTLogTranslate(GetDMGLogLang, "RDMFinished"),
+    [RDM_MANAGER_READYFORSTAFF] = TTTLogTranslate(GetDMGLogLang, "RDMReadyforstaff"),
 }
 
 RDM_MANAGER_STATUS = status
@@ -72,7 +73,8 @@ RDM_MANAGER_STATUS = status
 local icons = {
     [RDM_MANAGER_WAITING] = "icon16/clock.png",
     [RDM_MANAGER_PROGRESS] = "icon16/arrow_refresh.png",
-    [RDM_MANAGER_FINISHED] = "icon16/accept.png"
+    [RDM_MANAGER_FINISHED] = "icon16/accept.png",
+    [RDM_MANAGER_READYFORSTAFF] = "icon16/user_suit.png",
 }
 
 RDM_MANAGER_ICONS = icons
@@ -80,7 +82,8 @@ RDM_MANAGER_ICONS = icons
 local colors = {
     [RDM_MANAGER_PROGRESS] = Color(0, 0, 190),
     [RDM_MANAGER_FINISHED] = Color(0, 190, 0),
-    [RDM_MANAGER_WAITING] = Color(100, 100, 100)
+    [RDM_MANAGER_WAITING] = Color(100, 100, 100),
+    [RDM_MANAGER_READYFORSTAFF] = Color(245, 0, 192),
 }
 
 local function TakeAction()
@@ -425,6 +428,7 @@ function PANEL:UpdateReport(index)
 
     local cancelledIcon = report.status == RDM_MANAGER_WAITING
         and "icon16/exclamation.png"
+        or report.status == RDM_MANAGER_READYFORSTAFF and "icon16/user_suit.png"
         or (report.canceled and "icon16/tick.png" or "icon16/cross.png")
 
     if not self.Reports[index] then
@@ -731,6 +735,7 @@ function Damagelog:DrawRDMManager(x, y)
             DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
             DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
             DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
+            DrawStatusMenuOption(RDM_MANAGER_READYFORSTAFF, menu)
             menu:Open()
         end
 
