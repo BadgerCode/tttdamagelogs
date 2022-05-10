@@ -58,6 +58,7 @@ DamagelogLang.english = {
     RDMResponded = "Attacker responded",
     RDMInProgress = "In progress",
     RDMFinished = "Finished",
+    RDMReadyforstaff = "Waiting for staff",
     RDMCanceled = "Canceled by the victim",
     RDMNotFinished = "This report is not finished!",
     RDMSetConclusion = "Set conclusion",
