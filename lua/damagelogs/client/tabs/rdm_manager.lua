@@ -65,7 +65,7 @@ local status = {
     [RDM_MANAGER_WAITING] = TTTLogTranslate(GetDMGLogLang, "RDMWaiting"),
     [RDM_MANAGER_PROGRESS] = TTTLogTranslate(GetDMGLogLang, "RDMInProgress"),
     [RDM_MANAGER_FINISHED] = TTTLogTranslate(GetDMGLogLang, "RDMFinished"),
-    [RDM_MANAGER_READYFORSTAFF] = TTTLogTranslate(GetDMGLogLang, "RDMReadyforstaff"),
+    [RDM_MANAGER_READYFORSTAFF] = TTTLogTranslate(GetDMGLogLang, "RDMReadyForStaff"),
 }
 
 RDM_MANAGER_STATUS = status
