@@ -733,9 +733,9 @@ function Damagelog:DrawRDMManager(x, y)
             local menu = DermaMenu()
             local attacker = player.GetBySteamID(Damagelog.SelectedReport.attacker)
             DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
+            DrawStatusMenuOption(RDM_MANAGER_READYFORSTAFF, menu)
             DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
             DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
-            DrawStatusMenuOption(RDM_MANAGER_READYFORSTAFF, menu)
             menu:Open()
         end
 
