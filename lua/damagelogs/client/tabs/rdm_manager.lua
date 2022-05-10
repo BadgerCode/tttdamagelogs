@@ -314,7 +314,7 @@ local function TakeAction()
 
         if ulx and mode == 2 then
             txt = TTTLogTranslate(GetDMGLogLang, "RemoveAutoJails")
-        elseif sam or serverguard then
+        elseif serverguard then
             txt = TTTLogTranslate(GetDMGLogLang, "RemoveOneAutoSlay")
         end
 
@@ -327,7 +327,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0", " ")
                 elseif serverguard then
                     serverguard.command.Run("raslay", false, attacker:Nick())
                 end
@@ -335,7 +335,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0", " ")
                 else
                     Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, TTTLogTranslate(GetDMGLogLang, "VictimReportedDisconnected"), 2, "buttons/weapon_cant_buy.wav")
                 end
@@ -347,7 +347,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0", " ")
                 elseif serverguard then
                     serverguard.command.Run("raslay", false, victim:Nick())
                 end
@@ -355,7 +355,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0", " ")
                 else
                     Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, TTTLogTranslate(GetDMGLogLang, "VictimReportedDisconnected"), 2, "buttons/weapon_cant_buy.wav")
                 end
