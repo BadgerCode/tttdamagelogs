@@ -517,7 +517,7 @@ net.Receive("DL_UpdateStatus", function(_len, ply)
     tbl.admin = status == RDM_MANAGER_WAITING and false or ply:Nick()
     local msg
 
-    if status == RDM_MANAGER_WAITING then
+    if status == RDM_MANAGER_WAITING or status == RDM_MANAGER_READYFORSTAFF then
         msg = string_format(TTTLogTranslate(ply.DMGLogLang, "HasSetReport"), ply:Nick(), index, TTTLogTranslate(ply.DMGLogLang, "RDMWaiting"))
         local syncEnt = Damagelog:GetSyncEnt()
 
@@ -771,6 +771,9 @@ net.Receive("DL_GetForgive", function(_, ply)
             end
         end
     else
+        if tbl.status == RDM_MANAGER_WAITING then
+            tbl.status = RDM_MANAGER_READYFORSTAFF
+        end
         tbl.handedOffToAdminsAt = os.time()
     end
 
