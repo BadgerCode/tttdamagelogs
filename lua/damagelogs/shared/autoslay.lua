@@ -326,7 +326,7 @@ local function CreateCommand()
                 hint = "steamid/steamid64",
             })
 
-            :Help("remove slays from a person.")
+            :Help("remove slays from a steamid.")
 
             :OnExecute(function(admin, steamid)
                 
