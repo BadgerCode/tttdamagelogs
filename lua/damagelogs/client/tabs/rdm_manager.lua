@@ -1071,7 +1071,7 @@ function PANEL:SetPlayer(reported, ply, steamid, report)
             if ulx then
                 RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", ply:SteamID(), tostring(self.NumSlays), self.CurrentReason)
             elseif sam then
-                local reason = self.CurrentReason != "" and self.CurrentReason or " "
+                local reason = self.CurrentReason ~= "" and self.CurrentReason or " "
                 RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", ply:SteamID(), tostring(self.NumSlays), reason)
             elseif serverguard then
                 serverguard.command.Run("aslay", false, ply:Nick(), self.NumSlays, self.CurrentReason)
@@ -1083,7 +1083,7 @@ function PANEL:SetPlayer(reported, ply, steamid, report)
                 RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", (reported and report.attacker) or (not reported and report.victim), tostring(self.NumSlays), self.CurrentReason)
                 self.SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), self.NumSlays, self.CurrentReason)
             elseif sam then
-                local reason = self.CurrentReason != "" and self.CurrentReason or " "
+                local reason = self.CurrentReason ~= "" and self.CurrentReason or " "
                 RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", (reported and report.attacker) or (not reported and report.victim), tostring(self.NumSlays), reason)
                 self.SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), self.NumSlays, self.CurrentReason)
             else
