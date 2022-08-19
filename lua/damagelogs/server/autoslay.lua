@@ -271,13 +271,14 @@ function Damagelog:SetSlays(admin, steamid, slays, reason, target)
 
                         ulx.fancyLogAdmin(admin, "#A " .. (difference > 0 and "added " or "removed ") .. math.abs(difference) .. msg .. old_slays .. " time(s) by #s.", target, reason, list)
                     elseif sam then
-                        sam.player.send_message(nil, "{A} {V_1} {V} {V_2} {T} for {R}. They were previously {V_3} {V_4} time(s) by {V_5}.", {
+
+                        sam.player.send_message(nil, "{A} {V_1} {V} {V_2} {T} for {A_2}. They were previously {V_3} {V_4} time(s) by {V_5}.", {
                             A = admin_nick,
                             V_1 = difference > 0 and "added " or "removed ",
                             V = math.abs(difference),
                             V_2 = aslay and " autoslays to " or " autojails to ",
-                            T = target,
-                            R = reason,
+                            T = target:Nick(),
+                            A_2 = reason,
                             V_3 = aslay and " autoslain " or " autojailed ",
                             V_4 = old_slays,
                             V_5 = list
@@ -293,13 +294,13 @@ function Damagelog:SetSlays(admin, steamid, slays, reason, target)
 
                         ulx.fancyLogAdmin(admin, "#A " .. (difference > 0 and "added " or "removed ") .. math.abs(difference) .. msg .. old_slays .. " time(s) by #s.", steamid, reason, list)
                     elseif sam then
-                        sam.player.send_message(nil, "{A} {V_1} {V} {V_2} {T} for {R}. They were previously {V_3} {V_4} time(s) by {V_5}.", {
+                        sam.player.send_message(nil, "{A} {V_1} {V} {V_2} {T} for {A_2}. They were previously {V_3} {V_4} time(s) by {V_5}.", {
                             A = admin_nick,
                             V_1 = difference > 0 and "added " or "removed ",
                             V = math.abs(difference),
                             V_2 = aslay and " autoslays to " or " autojails to ",
                             T = steamid,
-                            R = reason,
+                            A_2 = reason,
                             V_3 = aslay and " autoslain " or " autojailed ",
                             V_4 = old_slays,
                             V_5 = list
