@@ -319,6 +319,24 @@ local function CreateCommand()
                 end)
             :End()
 
+            command.new("removeslaysid")
+            :SetPermission("removeslaysid", "operator")
+
+            :AddArg("text", {
+                hint = "steamid/steamid64",
+            })
+
+            :Help("remove slays from a person.")
+
+            :OnExecute(function(admin, steamid)
+                
+                local steamid64 = util.SteamIDFrom64( steamid )
+                local steamid = steamid64 ~= "STEAM_0:0:0" and steamid64 or steamid
+
+                Damagelog:SetSlays(admin, steamid, 0, "Removed")
+            end)
+        :End()
+
             command.new("cslay")
                 :SetPermission("cslay", "operator")
                 :AddArg("player", {
@@ -334,12 +352,17 @@ local function CreateCommand()
             command.new("cslayid")
                 :SetPermission("cslayid", "operator")
 
-                :AddArg("steamid")
+                :AddArg("text", {
+                    hint = "steamid/steamid64",
+                })
 
                 :Help("Get slays of a person.")
 
-                :OnExecute(function(admin, targets, amount, reason)
-                    local steamid = targets[1]
+                :OnExecute(function(admin, steamid)
+                    
+                    local steamid64 = util.SteamIDFrom64( steamid )
+                    local steamid = steamid64 ~= "STEAM_0:0:0" and steamid64 or steamid
+
                     sam.cslaysid(admin, steamid)
                 end)
             :End()
