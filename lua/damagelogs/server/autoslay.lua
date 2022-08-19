@@ -160,7 +160,8 @@ function Damagelog:SetSlays(admin, steamid, slays, reason, target)
     end
 
     if slays == 0 then
-        Damagelog.SQLiteDatabase.Query("DELETE FROM damagelog_autoslay WHERE ply = '" .. (target and target:SteamID() or steamid) .. "';")
+
+        Damagelog.SQLiteDatabase.Query("DELETE FROM damagelog_autoslay WHERE ply = '" .. (IsValid(target) and target:SteamID() or steamid) .. "';")
 
         if ulx then
             if target then
