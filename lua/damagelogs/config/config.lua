@@ -53,6 +53,8 @@ Damagelog.ULX_AutoslayMode = 1
 -- Force autoslain players to be innocents (ULX/SAM only)
 -- Do not enable this if another addon interferes with roles (Pointshop roles for example)
 Damagelog.ULX_Autoslay_ForceRole = true
+--Auto check Custom slay Reason
+Damagelog.Autoslay_CheckCustom = false
 -- Default autoslay reasons (ULX, SAM, and ServerGuard)
 Damagelog.Autoslay_DefaultReason = "Breaking Rules"
 Damagelog.Autoslay_DefaultReason1 = "Random Damage"
@@ -97,7 +99,8 @@ Damagelog.MoreReportsPerRound = false
 Damagelog.ReportsBeforePlaying = false
 -- Private message prefix from RDM Manager
 Damagelog.PrivateMessagePrefix = "[RDM Manager]"
-
+-- Allow banning thru the RDMManager
+Damagelog.AllowBanningThruManager = true
 
 
 -- Discord Webhooks

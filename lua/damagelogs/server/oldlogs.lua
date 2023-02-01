@@ -7,7 +7,6 @@ util.AddNetworkString("DL_SendOldLogRounds")
 Damagelog.previous_reports = {}
 local limit = os.time() - Damagelog.LogDays * 86400 --  24 * 60 * 60
 
-
 if Damagelog.Use_MySQL then
     require("mysqloo")
     include("damagelogs/config/mysqloo.lua")
@@ -235,7 +234,7 @@ net.Receive("DL_AskOldLogRounds", function(_, ply)
     local _date = "20" .. year .. "-" .. month .. "-" .. day -- TODO: not the best way if someone uses this in 2100 too ;)
 
     if Damagelog.Use_MySQL and Damagelog.MySQL_Connected then
-        local query_str = "SELECT date,map,round FROM damagelog_oldlogs_v3 WHERE date BETWEEN UNIX_TIMESTAMP(\"" .. _date .. " 00:00:00\") AND UNIX_TIMESTAMP(\"" .. _date .. " 23:59:59\") ORDER BY date ASC;"
+        local query_str = "SELECT date,map,round FROM damagelog_oldlogs_v3 WHERE year = ".. year .. " AND month = " .. month .. " AND day = " .. day .." ORDER BY date ASC;"
         local query = Damagelog.database:query(query_str)
 
         query.onSuccess = function(self)
@@ -253,7 +252,7 @@ net.Receive("DL_AskOldLogRounds", function(_, ply)
 
         query:start()
     else
-        local query_str = "SELECT date,map,round FROM damagelog_oldlogs_v3 WHERE date BETWEEN strftime(\"%s\", \"" .. _date .. " 00:00:00\") AND strftime(\"%s\", \"" .. _date .. " 23:59:59\") ORDER BY date ASC;"
+        local query_str = "SELECT date,map,round FROM damagelog_oldlogs_v3 WHERE  year = ".. year .. " AND month = " .. month .. " AND day = " .. day .."  ORDER BY date ASC;"
         local result = Damagelog.SQLiteDatabase.Query(query_str)
 
         if not result then
@@ -271,6 +270,29 @@ end)
 net.Receive("DL_AskOldLog", function(_, ply)
     if IsValid(ply) and ply:IsPlayer() and (not ply.lastLogs or (CurTime() - ply.lastLogs) > 2) then
         local _time = net.ReadUInt(32)
+        local isDamageTab = net.ReadBool()
+
+        ply.lastLogs = CurTime()
+
+        if isDamageTab then
+            local data, roles
+
+            if round == -1 then
+                data = Damagelog.PreviousMap.ShootTable
+                roles = Damagelog.PreviousMap.Roles
+            else
+                data = Damagelog.ShootTables[_time]
+                roles = Damagelog.Roles[_time]
+            end
+
+            if not roles or not data then return end
+
+            local payload = util.Compress(util.TableToJSON({ShootTable = data, Roles = roles }))
+
+            SendLogs(ply, payload, false)
+            return
+        end
+
 
         if Damagelog.Use_MySQL and Damagelog.MySQL_Connected then
             local query = Damagelog.database:query("SELECT UNCOMPRESS(damagelog) FROM damagelog_oldlogs_v3 WHERE date = " .. _time .. ";")
@@ -298,6 +320,4 @@ net.Receive("DL_AskOldLog", function(_, ply)
             end
         end
     end
-
-    ply.lastLogs = CurTime()
 end)

@@ -516,6 +516,8 @@ net.Receive("DL_UpdateStatus", function(_len, ply)
     tbl.status = status
     tbl.admin = status == RDM_MANAGER_WAITING and false or ply:Nick()
     local msg
+        
+    hook.Run("RDMManagerStatusUpdated", ply, index, status, previous)
 
     if status == RDM_MANAGER_WAITING or status == RDM_MANAGER_READYFORSTAFF then
         msg = string_format(TTTLogTranslate(ply.DMGLogLang, "HasSetReport"), ply:Nick(), index, TTTLogTranslate(ply.DMGLogLang, "RDMWaiting"))

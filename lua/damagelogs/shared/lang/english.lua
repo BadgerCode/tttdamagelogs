@@ -351,6 +351,7 @@ DamagelogLang.english = {
     RDMuponRDM = "Enable RDM Manager popups upon RDM",
     CurrentRoundLogs = "Open the current round by default if you're alive and allowed to open the logs",
     OutsideNotification = "Enable notification sound outside of the game",
+    ShotLogsDamageTab = "Shot shot logs next to the damage tab",
     DamagelogMenuSettings = "Damagelog menu settings",
     ForcedLanguage = "The server owner forced the use of this language",
     -- Filters
