@@ -139,7 +139,10 @@ local function CreateCommand()
 
         return
     elseif sam then
+        
+        -- SAM may run the below functions within a zero timer, to ensure they are overridden, we need a delay for reliability.
         timer.Simple(1, function()
+        
             function sam.autoslay(calling_ply, target, rounds, reason)
                 Damagelog:SetSlays(calling_ply, target:SteamID(), rounds, reason, target)
             end
