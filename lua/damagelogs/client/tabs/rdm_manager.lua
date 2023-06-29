@@ -64,7 +64,8 @@ end)
 local status = {
     [RDM_MANAGER_WAITING] = TTTLogTranslate(GetDMGLogLang, "RDMWaiting"),
     [RDM_MANAGER_PROGRESS] = TTTLogTranslate(GetDMGLogLang, "RDMInProgress"),
-    [RDM_MANAGER_FINISHED] = TTTLogTranslate(GetDMGLogLang, "RDMFinished")
+    [RDM_MANAGER_FINISHED] = TTTLogTranslate(GetDMGLogLang, "RDMFinished"),
+    [RDM_MANAGER_READYFORSTAFF] = TTTLogTranslate(GetDMGLogLang, "RDMReadyForStaff"),
 }
 
 RDM_MANAGER_STATUS = status
@@ -72,7 +73,8 @@ RDM_MANAGER_STATUS = status
 local icons = {
     [RDM_MANAGER_WAITING] = "icon16/clock.png",
     [RDM_MANAGER_PROGRESS] = "icon16/arrow_refresh.png",
-    [RDM_MANAGER_FINISHED] = "icon16/accept.png"
+    [RDM_MANAGER_FINISHED] = "icon16/accept.png",
+    [RDM_MANAGER_READYFORSTAFF] = "icon16/user_suit.png",
 }
 
 RDM_MANAGER_ICONS = icons
@@ -80,7 +82,8 @@ RDM_MANAGER_ICONS = icons
 local colors = {
     [RDM_MANAGER_PROGRESS] = Color(0, 0, 190),
     [RDM_MANAGER_FINISHED] = Color(0, 190, 0),
-    [RDM_MANAGER_WAITING] = Color(100, 100, 100)
+    [RDM_MANAGER_WAITING] = Color(100, 100, 100),
+    [RDM_MANAGER_READYFORSTAFF] = Color(245, 0, 192),
 }
 
 local function TakeAction()
@@ -313,7 +316,7 @@ local function TakeAction()
 
         if ulx and mode == 2 then
             txt = TTTLogTranslate(GetDMGLogLang, "RemoveAutoJails")
-        elseif sam or serverguard then
+        elseif serverguard then
             txt = TTTLogTranslate(GetDMGLogLang, "RemoveOneAutoSlay")
         end
 
@@ -326,7 +329,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0", " ")
                 elseif serverguard then
                     serverguard.command.Run("raslay", false, attacker:Nick())
                 end
@@ -334,7 +337,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.attacker, "0", " ")
                 else
                     Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, TTTLogTranslate(GetDMGLogLang, "VictimReportedDisconnected"), 2, "buttons/weapon_cant_buy.wav")
                 end
@@ -346,7 +349,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0", " ")
                 elseif serverguard then
                     serverguard.command.Run("raslay", false, victim:Nick())
                 end
@@ -354,7 +357,7 @@ local function TakeAction()
                 if ulx then
                     RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
                 elseif sam then
-                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0")
+                    RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", report.victim, "0", " ")
                 else
                     Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, TTTLogTranslate(GetDMGLogLang, "VictimReportedDisconnected"), 2, "buttons/weapon_cant_buy.wav")
                 end
@@ -427,6 +430,7 @@ function PANEL:UpdateReport(index)
 
     local cancelledIcon = report.status == RDM_MANAGER_WAITING
         and "icon16/exclamation.png"
+        or report.status == RDM_MANAGER_READYFORSTAFF and "icon16/user_suit.png"
         or (report.canceled and "icon16/tick.png" or "icon16/cross.png")
 
     if not self.Reports[index] then
@@ -731,6 +735,7 @@ function Damagelog:DrawRDMManager(x, y)
             local menu = DermaMenu()
             local attacker = player.GetBySteamID(Damagelog.SelectedReport.attacker)
             DrawStatusMenuOption(RDM_MANAGER_WAITING, menu)
+            DrawStatusMenuOption(RDM_MANAGER_READYFORSTAFF, menu)
             DrawStatusMenuOption(RDM_MANAGER_PROGRESS, menu)
             DrawStatusMenuOption(RDM_MANAGER_FINISHED, menu)
             menu:Open()
@@ -1072,7 +1077,8 @@ function PANEL:SetPlayer(reported, ply, steamid, report)
             if ulx then
                 RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", ply:SteamID(), tostring(self.NumSlays), self.CurrentReason)
             elseif sam then
-                RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", ply:SteamID(), tostring(self.NumSlays), self.CurrentReason)
+                local reason = self.CurrentReason ~= "" and self.CurrentReason or " "
+                RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", ply:SteamID(), tostring(self.NumSlays), reason)
             elseif serverguard then
                 serverguard.command.Run("aslay", false, ply:Nick(), self.NumSlays, self.CurrentReason)
             end
@@ -1083,7 +1089,8 @@ function PANEL:SetPlayer(reported, ply, steamid, report)
                 RunConsoleCommand("ulx", mode == 1 and "aslayid" or "ajailid", (reported and report.attacker) or (not reported and report.victim), tostring(self.NumSlays), self.CurrentReason)
                 self.SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), self.NumSlays, self.CurrentReason)
             elseif sam then
-                RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", (reported and report.attacker) or (not reported and report.victim), tostring(self.NumSlays), self.CurrentReason)
+                local reason = self.CurrentReason ~= "" and self.CurrentReason or " "
+                RunConsoleCommand("sam", mode == 1 and "aslayid" or "ajailid", (reported and report.attacker) or (not reported and report.victim), tostring(self.NumSlays), reason)
                 self.SetConclusion((reported and report.attacker_nick) or (not reported and report.victim_nick), self.NumSlays, self.CurrentReason)
             else
                 Damagelog:Notify(DAMAGELOG_NOTIFY_ALERT, TTTLogTranslate(GetDMGLogLang, "VictimReportedDisconnected"), 2, "buttons/weapon_cant_buy.wav")

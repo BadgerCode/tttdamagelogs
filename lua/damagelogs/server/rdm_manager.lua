@@ -519,7 +519,7 @@ net.Receive("DL_UpdateStatus", function(_len, ply)
         
     hook.Run("RDMManagerStatusUpdated", ply, index, status, previous)
 
-    if status == RDM_MANAGER_WAITING then
+    if status == RDM_MANAGER_WAITING or status == RDM_MANAGER_READYFORSTAFF then
         msg = string_format(TTTLogTranslate(ply.DMGLogLang, "HasSetReport"), ply:Nick(), index, TTTLogTranslate(ply.DMGLogLang, "RDMWaiting"))
         local syncEnt = Damagelog:GetSyncEnt()
 
@@ -537,15 +537,19 @@ net.Receive("DL_UpdateStatus", function(_len, ply)
 
         local syncEnt = Damagelog:GetSyncEnt()
 
-        if IsValid(syncEnt) and previousStatus == RDM_MANAGER_WAITING and not tbl.adminReport then
-            syncEnt:SetPendingReports(syncEnt:GetPendingReports() - 1)
+        if IsValid(syncEnt) and not tbl.adminReport then
+            if previousStatus == RDM_MANAGER_WAITING or previousStatus == RDM_MANAGER_READYFORSTAFF then
+                syncEnt:SetPendingReports(syncEnt:GetPendingReports() - 1)
+            end
         end
     elseif status == RDM_MANAGER_FINISHED then
         msg = string_format(TTTLogTranslate(ply.DMGLogLang, "HasSetReport"), ply:Nick(), index, TTTLogTranslate(ply.DMGLogLang, "Finished"))
         local syncEnt = Damagelog:GetSyncEnt()
 
-        if IsValid(syncEnt) and previousStatus == RDM_MANAGER_WAITING and not tbl.adminReport then
-            syncEnt:SetPendingReports(syncEnt:GetPendingReports() - 1)
+        if IsValid(syncEnt) and not tbl.adminReport then
+            if previousStatus == RDM_MANAGER_WAITING or previousStatus == RDM_MANAGER_READYFORSTAFF then
+                syncEnt:SetPendingReports(syncEnt:GetPendingReports() - 1)
+            end
         end
     end
 
@@ -773,6 +777,9 @@ net.Receive("DL_GetForgive", function(_, ply)
             end
         end
     else
+        if tbl.status == RDM_MANAGER_WAITING then
+            tbl.status = RDM_MANAGER_READYFORSTAFF
+        end
         tbl.handedOffToAdminsAt = os.time()
     end
 
