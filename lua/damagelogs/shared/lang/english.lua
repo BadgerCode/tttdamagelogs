@@ -411,7 +411,7 @@ DamagelogLang.english = {
     rdmmanager_action_ban_submit = "Ban",
     dmglogs_btn_highlight = "Highlight",
 
-    role_change = "%s [%s] was changed into [%s]",
+    role_change = "%s [%s] has changed into [%s]",
     role_item = "%s [%s] used %s on %s [%s]",
     revive = "%s [%s] has been revived"
 }

@@ -11,7 +11,7 @@ if SERVER then
     --end
 else
     Damagelog:AddFilter("filter_show_roles", DAMAGELOG_FILTER_BOOL, true)
-    Damagelog:AddColor("color_roles", Color(0, 128, 0, 255))
+    Damagelog:AddColor("color_roles", Color(128, 64, 0))
 end
 local event = {}
 event.Type = "ROLE"
