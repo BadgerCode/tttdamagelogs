@@ -170,12 +170,17 @@ function Damagelog:SetListViewTable(listview, tbl, nofilters, old)
 
     if #tbl.logs > 0 then
         local added = false
-
-        for _, v in ipairs(tbl.logs) do
-            local line_added = self:AddLogsLine(listview, v, tbl.roles, nofilters, old)
+        local roles = tbl.roles
+        for k, v in ipairs(tbl.logs) do
+            local line_added = self:AddLogsLine(listview, v, roles, nofilters, old)
 
             if not added and line_added then
                 added = true
+            end
+
+            if (CR_VERSION or TTT2) and Damagelog:CheckRoleUpdates(v) then
+                local infos = v["infos"]
+                roles[infos[2]]["role"] = infos[4] 
             end
         end
 
@@ -185,6 +190,13 @@ function Damagelog:SetListViewTable(listview, tbl, nofilters, old)
     else
         listview:AddLine("", "", TTTLogTranslate(GetDMGLogLang, "EmptyLogs"))
     end
+end
+
+function Damagelog:CheckRoleUpdates(tbl)
+    if self.events[tbl.id]["Type"] == "ROLE" and tbl.infos[1] == 1 then
+        return true
+    end
+    return false
 end
 
 function Damagelog:SetRolesListView(listview, tbl)
