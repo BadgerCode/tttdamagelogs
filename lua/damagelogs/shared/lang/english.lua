@@ -371,6 +371,7 @@ DamagelogLang.english = {
     filter_show_equipment_usage = "Show equipment usage (if supported)",
     filter_show_c4 = "Show C4",
     filter_show_drownings = "Show drownings",
+    filter_show_roles = "Show role changes",
     -- Colors
     color_found_bodies = "Found bodies",
     colors_aslays = "Auto Slays",
@@ -408,5 +409,9 @@ DamagelogLang.english = {
     rdmmanager_action_ban = "Ban",
     rdmmanager_action_ban_title = "Banning",
     rdmmanager_action_ban_submit = "Ban",
-    dmglogs_btn_highlight = "Highlight"
+    dmglogs_btn_highlight = "Highlight",
+
+    role_change = "%s [%s] was changed into [%s]",
+    role_item = "%s [%s] used %s on %s [%s]",
+    revive = "%s [%s] has been revived"
 }
