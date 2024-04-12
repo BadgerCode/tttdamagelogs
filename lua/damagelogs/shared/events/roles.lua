@@ -17,7 +17,7 @@ local event = {}
 event.Type = "ROLE"
 
 function event:TTTPlayerRoleChanged(ply, oldRole, newRole)
-    if oldRole == ROLE_NONE or oldRole == newRole or newRole == ROLE_NONE then return end
+    if oldRole == nil or oldRole == ROLE_NONE or oldRole == newRole or newRole == ROLE_NONE then return end
     self.CallEvent({
         [1] = 1,
         [2] = ply:GetDamagelogID(),
@@ -50,8 +50,8 @@ function event:ToString(v, roles)
     if v[1] == 1 then
         return string.format(TTTLogTranslate(GetDMGLogLang, "role_change"), ply.nick, Damagelog:StrRole(v[3]), Damagelog:StrRole(v[4]))
     elseif v[1] == 2 then
-        local target = Damagelog:InfoFromID(roles, v[3])
-        return string.format(TTTLogTranslate(GetDMGLogLang, "role_item"), ply.nick, Damagelog:StrRole(ply.role),  Damagelog:GetWeaponName(v[4]), target.nick, Damagelog:StrRole(target.role))
+        local tgt = Damagelog:InfoFromID(roles, v[3])
+        return string.format(TTTLogTranslate(GetDMGLogLang, "role_item"), ply.nick, Damagelog:StrRole(ply.role),  Damagelog:GetWeaponName(v[4]), tgt.nick, Damagelog:StrRole(tgt.role))
     elseif v[1] == 3 then
         return string.format(TTTLogTranslate(GetDMGLogLang, "revive"), ply.nick, Damagelog:StrRole(ply.role))
     end
@@ -72,6 +72,11 @@ end
 function event:RightClick(line, tbl, roles, text)
     line:ShowTooLong(true)
     local ply = Damagelog:InfoFromID(roles, tbl[2])
+    if tbl[1] == 2 then
+        local tgt = Damagelog:InfoFromID(roles, tbl[3])
+        line:ShowCopy(true, {ply.nick, util.SteamIDFrom64(ply.steamid64)}, {tgt.nick, util.SteamIDFrom64(tgt.steamid64)})
+        return
+    end
     line:ShowCopy(true, {ply.nick, util.SteamIDFrom64(ply.steamid64)})
 end
 

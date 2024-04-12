@@ -171,7 +171,7 @@ function Damagelog:SetListViewTable(listview, tbl, nofilters, old)
     if #tbl.logs > 0 then
         local added = false
         local roles = tbl.roles
-        for k, v in ipairs(tbl.logs) do
+        for _, v in ipairs(tbl.logs) do
             local line_added = self:AddLogsLine(listview, v, roles, nofilters, old)
 
             if not added and line_added then
