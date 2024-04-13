@@ -371,9 +371,10 @@ end)
 
 function Damagelog:UpdateRecentRole(ply, role)
     if GetRoundState() ~= ROUND_ACTIVE then return end
-    print(role)
-    -- Worst case post + prep | ttt_roundrestart is less than lastlogs time
+    local round = self.CurrentRound
+
     timer.Simple(10, function()
+        if round ~= self.CurrentRound then return end
         RecentRoles[ply:GetDamagelogID()]["role"] = role
     end)
 end
