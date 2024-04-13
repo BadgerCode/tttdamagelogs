@@ -24,6 +24,7 @@ function event:TTTPlayerRoleChanged(ply, oldRole, newRole)
         [3] = oldRole,
         [4] = newRole
     })
+    Damagelog:UpdateRecentRole(ply, newRole)
 end
 
 function event:TTTPlayerRoleChangedByItem(ply, tgt, item)
