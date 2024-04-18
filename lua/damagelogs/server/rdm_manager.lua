@@ -679,9 +679,43 @@ hook_Add("PlayerInitialSpawn", "PlayerInitialSpawn_RDM_Manager", function(ply)
     end)
 end)
 
+local function CheckRevive(ply)
+    if CR_VERSION and ply:IsRespawning() then
+        return true
+    elseif TTT2 and ply:IsReviving() then
+        return true
+    end
+    return false
+end
+
 hook_Add("PlayerDeath", "RDM_Manager", function(ply)
+
+    if GetRoundState() == ROUND_ACTIVE and (TTT2 or CR_VERSION) then
+        --Instant Respawn Cases
+        timer.Simple(1, function()
+            if ply:Alive() then return end
+        end)
+        -- Delayed Respawn Check
+        if CheckRevive(ply) then
+            net.Start("DL_Delayed")
+            net.Send(ply)
+
+            timer.Create("RDM_RespawnDelay_" .. ply:SteamID64(), 5, 1, function()
+                net.Start("DL_Death")
+                net.Send(ply)
+            end)
+            return
+        end
+    end
+
     net.Start("DL_Death")
     net.Send(ply)
+end)
+
+hook_Add("PlayerSpawn", "RDM_RespawnCancel", function(ply)
+    if timer.Exists("RDM_RespawnDelay_" .. ply:SteamID64()) then
+        timer.Remove("RDM_RespawnDelay_" .. ply:SteamID64())
+    end
 end)
 
 hook_Add("TTTEndRound", "RDM_Manager", function()
