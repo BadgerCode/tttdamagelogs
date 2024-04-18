@@ -680,6 +680,12 @@ hook_Add("PlayerInitialSpawn", "PlayerInitialSpawn_RDM_Manager", function(ply)
 end)
 
 hook_Add("PlayerDeath", "RDM_Manager", function(ply)
+
+    --Instant Respawn Cases
+    timer.Simple(1, function()
+        if ply:Alive() then return end
+    end)
+
     net.Start("DL_Death")
     net.Send(ply)
 end)
