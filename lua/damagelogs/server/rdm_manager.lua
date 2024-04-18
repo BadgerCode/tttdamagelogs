@@ -697,11 +697,9 @@ hook_Add("PlayerDeath", "RDM_Manager", function(ply)
         end)
         -- Delayed Respawn Check
         if CheckRevive(ply) then
-            /*
-            if (reportcount > 0) then
-                ply:PrintMessage(HUD_PRINTTALK, "You have " .. reportcount .. " pending reports, you are required to respond if you are unable to be revived.")
-            end
-            */
+            net.Start("DL_Delayed")
+            net.Send(ply)
+
             timer.Create("RDM_RespawnDelay_" .. ply:SteamID64(), 5, 1, function()
                 net.Start("DL_Death")
                 net.Send(ply)
