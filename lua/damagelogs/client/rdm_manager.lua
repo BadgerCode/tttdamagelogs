@@ -856,6 +856,12 @@ net.Receive("DL_Death", function()
     end
 end)
 
+net.Receive("DL_Delayed", function()
+    if #Damagelog.ReportsQueue > 0 then
+        LocalPlayer():PrintMessage(HUD_PRINTTALK, string_format(TTTLogTranslate(GetDMGLogLang, "reportDelayed"), #Damagelog.ReportsQueue))
+    end
+end)
+
 net.Receive("DL_SendForgive", function()
     local previous = net.ReadUInt(1) == 1
     local canceled = net.ReadUInt(1) == 1
