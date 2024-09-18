@@ -367,7 +367,7 @@ function Damagelog:ReportWindow(found, deathLogs, previousReports, currentReport
         UserList:AddPlayer(killer, true)
     end
 
-    for _, v in ipairs(player.GetAll()) do
+    for _, v in player.Iterator() do
         if not (v == killer or v == client) then
             UserList:AddPlayer(v, false)
         end
