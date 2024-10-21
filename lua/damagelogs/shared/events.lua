@@ -71,6 +71,7 @@ if SERVER then
 end
 
 function Damagelog:InfoFromID(tbl, id)
+    if not tbl then tbl = {} end
     return tbl[id] or {
         steamid64 = -1,
         role = -1,
@@ -79,14 +80,14 @@ function Damagelog:InfoFromID(tbl, id)
 end
 
 function Damagelog:IsTeamkill(role1, role2)
-	if role1 == role2 then 
-		return true
-	elseif role1 == ROLE_DETECTIVE and role2 == ROLE_INNOCENT then 
-		return true
-	elseif role1 == ROLE_INNOCENT and role2 == ROLE_DETECTIVE then 
-		return true
-	end
-	return false
+    if role1 == role2 then 
+        return true
+    elseif role1 == ROLE_DETECTIVE and role2 == ROLE_INNOCENT then 
+        return true
+    elseif role1 == ROLE_INNOCENT and role2 == ROLE_DETECTIVE then 
+        return true
+    end
+    return false
 end
 
 
