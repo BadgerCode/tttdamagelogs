@@ -617,7 +617,7 @@ function Damagelog:ReportWindow(found, deathLogs, previousReports, currentReport
         conclusionText:SizeToContents()
         icon:SetImage(RDM_MANAGER_ICONS[tbl.status])
 
-        if tbl.canceled then
+        if tbl.canceled == 1 then
             cancel:SetDisabled(true)
             cancel:SetText(TTTLogTranslate(GetDMGLogLang, "ReportCanceled"))
         else
@@ -626,7 +626,7 @@ function Damagelog:ReportWindow(found, deathLogs, previousReports, currentReport
 
             cancel.DoClick = function(cancel)
                 net.Start("DL_GetForgive")
-                net.WriteUInt(1, 1)
+                net.WriteUInt(1, 16)
                 net.WriteUInt(tbl.previous and 1 or 0, 1)
                 net.WriteUInt(tbl.index, 16)
                 net.SendToServer()
@@ -858,7 +858,7 @@ end)
 
 net.Receive("DL_SendForgive", function()
     local previous = net.ReadUInt(1) == 1
-    local canceled = net.ReadUInt(1) == 1
+    local canceled = net.ReadUInt(8)
     local index = net.ReadUInt(16)
     local nick = net.ReadString()
     local text = net.ReadString()
@@ -870,7 +870,7 @@ net.Receive("DL_SendForgive", function()
     answer:MakePopup()
     local bonus = 0
 
-    if canceled then
+    if canceled == 1 then
         local InfoLabel = vgui.Create("Damagelog_InfoLabel", answer)
         InfoLabel:SetText(TTTLogTranslate(GetDMGLogLang, "AlreadyCanceled"))
         InfoLabel:SetInfoColor("blue")
@@ -887,7 +887,7 @@ net.Receive("DL_SendForgive", function()
     message:SetEditable(false)
     message:SetMultiline(true)
 
-    if not canceled then
+    if canceled != 1 then
         local forgive = vgui.Create("DButton", answer)
         forgive:SetText(TTTLogTranslate(GetDMGLogLang, "Forgive"))
         forgive:SetPos(5, 135)
@@ -895,7 +895,7 @@ net.Receive("DL_SendForgive", function()
 
         forgive.DoClick = function(self)
             net.Start("DL_GetForgive")
-            net.WriteUInt(1, 1)
+            net.WriteUInt(1, 16)
             net.WriteUInt(previous and 1 or 0, 1)
             net.WriteUInt(index, 16)
             net.SendToServer()
@@ -904,14 +904,14 @@ net.Receive("DL_SendForgive", function()
     end
 
     local nope = vgui.Create("DButton", answer)
-    nope:SetText(canceled and TTTLogTranslate(GetDMGLogLang, "Close") or TTTLogTranslate(GetDMGLogLang, "KeepReport"))
+    nope:SetText(canceled == 1 and TTTLogTranslate(GetDMGLogLang, "Close") or TTTLogTranslate(GetDMGLogLang, "KeepReport"))
     nope:SetPos(208, 135 + bonus)
     nope:SetSize(188, 30)
 
     nope.DoClick = function(self)
-        if not canceled then
+        if canceled != 1 then
             net.Start("DL_GetForgive")
-            net.WriteUInt(0, 1)
+            net.WriteUInt(0, 16)
             net.WriteUInt(previous and 1 or 0, 1)
             net.WriteUInt(index, 16)
             net.SendToServer()

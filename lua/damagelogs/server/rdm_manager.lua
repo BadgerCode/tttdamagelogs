@@ -578,7 +578,7 @@ net.Receive("DL_UpdateStatus", function(_len, ply)
             reportMessage = tbl.message,
             responseMessage = tbl.response or "Unknown",
             reportForgiven = {
-                forgiven = tbl.canceled
+                forgiven = tbl.canceled == 1
             },
             reportHandled = {
                 admin = {
@@ -640,7 +640,7 @@ net.Receive("DL_Conclusion", function(_len, ply)
             reportMessage = tbl.message,
             responseMessage = tbl.response or "Unknown",
             reportForgiven = {
-                forgiven = tbl.canceled
+                forgiven = tbl.canceled == 1
             },
             reportHandled = {
                 admin = {
@@ -717,9 +717,13 @@ function HandleReportedPlayerAnswer(ply, previous, text, index)
     local victim = GetBySteamID(tbl.victim)
 
     if IsValid(victim) then
+
         net.Start("DL_SendForgive")
         net.WriteUInt(previous and 1 or 0, 1)
-        net.WriteUInt(tbl.canceled and 1 or 0, 1)
+        if !tbl.canceled then
+            tbl.canceled = -1
+        end
+        net.WriteUInt(tbl.canceled, 8)
         net.WriteUInt(index, 16)
         net.WriteString(tbl.attacker_nick)
         net.WriteString(text)
@@ -741,7 +745,7 @@ end)
 
 
 net.Receive("DL_GetForgive", function(_, ply)
-    local forgive = net.ReadUInt(1) == 1
+    local forgive = net.ReadUInt(16)
     local previous = net.ReadUInt(1) == 1
     local index = net.ReadUInt(16)
     local tbl = previous and Damagelog.Reports.Previous[index] or Damagelog.Reports.Current[index]
@@ -758,8 +762,8 @@ net.Receive("DL_GetForgive", function(_, ply)
         return
     end
 
-    if forgive then
-        tbl.canceled = true
+    if forgive == 1 then
+        tbl.canceled = 1
 
         if tbl.status == RDM_MANAGER_WAITING then
             tbl.status = RDM_MANAGER_FINISHED
@@ -774,11 +778,12 @@ net.Receive("DL_GetForgive", function(_, ply)
         end
     else
         tbl.handedOffToAdminsAt = os.time()
+        tbl.canceled = 0
     end
 
     for _, v in ipairs(player_GetHumans()) do
         if v:CanUseRDMManager() then
-            if forgive then
+            if forgive == 1 then
                 if v:IsActive() then
                     v:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, TTTLogTranslate(v.DMGLogLang, "TheReport") .. " #" .. index .. " " .. TTTLogTranslate(v.DMGLogLang, "HasCanceledByVictim"), 5, "damagelogs/vote_yes.wav")
                 else
@@ -796,7 +801,7 @@ net.Receive("DL_GetForgive", function(_, ply)
         end
     end
 
-    if forgive then
+    if forgive == 1 then
         ply:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, string_format(TTTLogTranslate(ply.DMGLogLang, "YouDecidedForgive"), tbl.attacker_nick), 5, "damagelogs/vote_yes.wav")
     else
         ply:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, string_format(TTTLogTranslate(ply.DMGLogLang, "YouDecidedNotForgive"), tbl.attacker_nick), 5, "damagelogs/vote_no.wav")
@@ -805,7 +810,7 @@ net.Receive("DL_GetForgive", function(_, ply)
     local attacker = GetBySteamID(tbl.attacker)
 
     if IsValid(attacker) then
-        if forgive then
+        if forgive == 1 then
             attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, string_format(TTTLogTranslate(attacker.DMGLogLang, "DecidedToForgiveYou"), ply:Nick()), 5, "damagelogs/vote_yes.wav")
         else
             attacker:Damagelog_Notify(DAMAGELOG_NOTIFY_INFO, string_format(TTTLogTranslate(attacker.DMGLogLang, "DecidedNotToForgiveYou"), ply:Nick()), 5, "damagelogs/vote_no.wav")
@@ -814,7 +819,7 @@ net.Receive("DL_GetForgive", function(_, ply)
 
     Damagelog:SendLogToVictim(tbl)
     UpdatePreviousReports()
-    hook_Call("TTTDLog_Decide", nil, ply, IsValid(attacker) and attacker or tbl.attacker, forgive, index)
+    hook_Call("TTTDLog_Decide", nil, ply, IsValid(attacker) and attacker or tbl.attacker, forgive == 1, index)
 
 
     local discordUpdate = {
@@ -832,7 +837,7 @@ net.Receive("DL_GetForgive", function(_, ply)
         reportMessage = tbl.message,
         responseMessage = tbl.response,
         reportForgiven = {
-            forgiven = forgive
+            forgiven = forgive == 1
         },
         reportHandled = nil
     }

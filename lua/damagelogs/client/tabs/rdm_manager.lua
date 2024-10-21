@@ -439,9 +439,14 @@ function PANEL:UpdateReport(index)
 
     local tbl = {report.index, report.adminReport and "N/A (Admin Report)" or report.victim_nick, report.attacker_nick, report.round or "?", str, report.adminReport and "N/A" or "", self:GetStatus(report)}
 
-    local cancelledIcon = report.status == RDM_MANAGER_WAITING
-        and "icon16/exclamation.png"
-        or (report.canceled and "icon16/tick.png" or "icon16/cross.png")
+    local cancelledIcon = "icon16/exclamation.png"
+    if (report.canceled != nil) then
+        if report.canceled == 1 then
+            cancelledIcon = "icon16/tick.png"
+        elseif report.canceled == 0 then
+            cancelledIcon = "icon16/cross.png"
+        end
+    end
 
     if not self.Reports[index] then
         -- We have received a new report/an existing report for the first time
@@ -541,6 +546,14 @@ function PANEL:UpdateReport(index)
     end
 
     return self.Reports[index]
+end
+
+function PANEL:DoDoubleClick(lineID, line)
+    net.Start("DL_UpdateStatus")
+    net.WriteUInt(Damagelog.SelectedReport.previous and 1 or 0, 1)
+    net.WriteUInt(Damagelog.SelectedReport.index, 16)
+    net.WriteUInt(RDM_MANAGER_PROGRESS, 4)
+    net.SendToServer()
 end
 
 function PANEL:AddReport(index)
@@ -731,6 +744,7 @@ function Damagelog:DrawRDMManager(x, y)
         TakeActionB.DoClick = function(self)
             TakeAction()
         end
+
 
         local SetState = vgui.Create("DButton", Background)
         SetState:SetText(TTTLogTranslate(GetDMGLogLang, "SStatus"))
