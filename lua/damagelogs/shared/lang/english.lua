@@ -413,6 +413,5 @@ DamagelogLang.english = {
 
     role_change = "%s [%s] has changed into [%s]",
     role_item = "%s [%s] used %s on %s [%s]",
-    revive = "%s [%s] has been revived",
-    reportDelayed = "You have %s pending reports against you, you are required to respond if you are unable to be revived shortly."
+    revive = "%s [%s] has been revived"
 }
