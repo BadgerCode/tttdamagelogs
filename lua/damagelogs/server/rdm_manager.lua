@@ -4,7 +4,7 @@ local hook_Call, hook_Add = hook.Call, hook.Add
 local util_JSONToTable, util_TableToJSON = util.JSONToTable, util.TableToJSON
 local player_GetHumans = player.GetHumans
 local table_Copy, table_Empty, table_insert, table_HasValue = table.Copy, table.Empty, table.insert, table.HasValue
-local string_Left, string_lower, string_gsub, string_format = string.Left, string.lower, string.gsub, string.format
+local string_Left, string_lower, string_format = string.Left, string.lower, string.format
 util.AddNetworkString("DL_AllowReport")
 util.AddNetworkString("DL_ReportPlayer")
 util.AddNetworkString("DL_UpdateReports")
@@ -301,7 +301,6 @@ function HandlePlayerReport(ply, attacker, message, reportType)
         reportType = DAMAGELOG_REPORT_STANDARD
     end
 
-    message = string_gsub(string_gsub(message, "[^%g\128-\191\194-\197\208-\210 ]+", ""), "%s+", " ")
     local adminOnline = AreAdminsOnline()
 
     -- TODO: Is this check correct? This means all the logic below only runs if the player isn't able to report anyway?
@@ -738,7 +737,6 @@ function HandleReportedPlayerAnswer(ply, previous, text, index)
         return
     end
 
-    text = string_gsub(string_gsub(text, "[^%g\128-\191\194-\197\208-\210 ]+", ""), "%s+", " ")
     tbl.response = text
 
     for _, v in ipairs(player_GetHumans()) do

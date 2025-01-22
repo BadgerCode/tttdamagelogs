@@ -151,7 +151,7 @@ function Damagelog:TTTBeginRound()
         self.ShootTables[rounds + 1] = {}
         self.Roles[rounds + 1] = {}
 
-        for _, v in ipairs(player.GetAll()) do
+        for _, v in player.Iterator() do
             v:AddToDamagelogRoles(false)
         end
 

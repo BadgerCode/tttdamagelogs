@@ -55,6 +55,13 @@ If you have a question, issue or feature request, please raise an issue in the [
 
 ## Installation
 
+> **Note**: When updating from a version before 3.6.0, you should backup your Lua configuration file
+> 
+> Otherwise, you may accidentally delete your configuration changes!<br>
+> [Read more](https://github.com/BadgerCode/tttdamagelogs/wiki/Configuring-the-damage-logs)
+
+<br>
+
 1. Go to the [Releases](https://github.com/BadgerCode/tttdamagelogs/releases) section
 2. Download the **Source Code (zip)** for the latest version
 3. Extract the zip to a folder called `tttdamagelogs`

@@ -48,7 +48,10 @@ function event:DoPlayerDeath(ply, attacker, dmginfo)
 
         if attacker:GetRole() == ROLE_TRAITOR and (ply:GetRole() == ROLE_INNOCENT or ply:GetRole() == ROLE_DETECTIVE)
           or TTT2 and attacker:GetTeam() == TEAM_TRAITOR and not attacker:IsInTeam(ply)
-          or CR_VERSION and attacker:IsTraitorTeam() and not ply:IsTraitorTeam() then
+          -- Jesters are sometimes supposed to be killed, but when they aren't they generally have their own punishment mechanism so we don't need to mark this kill as RDM
+          -- Jesters also aren't supposed to be able to kill anyone, but there are some workshop weapons that bypass the damage blocking so we'll just allow their kills as non-RDM to be safe
+          -- Traitors, Monsters, and Indepedents are supposed to be killing everyone else so it's only RDM when they kill their own team (there are some edge cases with independents, but we won't get into that)
+          or CR_VERSION and (attacker:IsJesterTeam() or ply:IsJesterTeam() or ((attacker:IsTraitorTeam() or attacker:IsMonsterTeam() or attacker:IsIndependentTeam()) and not attacker:IsSameTeam(ply))) then
             net.WriteUInt(0, 1)
         else
             net.WriteUInt(1, 1)

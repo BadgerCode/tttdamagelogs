@@ -55,6 +55,8 @@ local function BuildReportFrame(report)
             return
         end
 
+        RunConsoleCommand("-voicerecord")
+        
         net.Start("DL_Answering")
         net.SendToServer()
         ReportFrame = vgui.Create("DFrame")
@@ -122,7 +124,7 @@ local function BuildReportFrame(report)
 
             Button.DoClick = function()
                 local text = string.Trim(TextEntry:GetValue())
-                local size = #text:gsub("[^%g\128-\191\208-\210]+", ""):gsub("%s+", " ")
+                local size = #text
 
                 if size < 10 then
                     ShowError(TTTLogTranslate(GetDMGLogLang, "MinCharacters"))
@@ -365,7 +367,7 @@ function Damagelog:ReportWindow(found, deathLogs, previousReports, currentReport
         UserList:AddPlayer(killer, true)
     end
 
-    for _, v in ipairs(player.GetAll()) do
+    for _, v in player.Iterator() do
         if not (v == killer or v == client) then
             UserList:AddPlayer(v, false)
         end
@@ -430,7 +432,7 @@ function Damagelog:ReportWindow(found, deathLogs, previousReports, currentReport
     Submit:SetSize(370, 25)
 
     Submit.Think = function(self)
-        local characters = #Entry:GetText():gsub("[^%g\128-\191\208-\210]+", ""):gsub("%s+", " ")
+        local characters = #Entry:GetText()
         local disable = characters < 10 or not cur_selected
 
         if (select(2, Type:GetSelected()) ~= DAMAGELOG_REPORT_CHAT) then

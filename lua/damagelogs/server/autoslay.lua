@@ -572,7 +572,7 @@ if Damagelog.ULX_Autoslay_ForceRole then
                     GAMEMODE.LastRole = {}
                 end
 
-                for _, v in ipairs(player.GetHumans()) do
+                for _, v in player.Iterator() do
                     if IsValid(v) and (not v:IsSpec()) and not (v.AutoslaysLeft and tonumber(v.AutoslaysLeft) > 0) then
                         local r = GAMEMODE.LastRole[v:SteamID()] or v:GetRole() or ROLE_INNOCENT
                         table.insert(prev_roles[r], v)

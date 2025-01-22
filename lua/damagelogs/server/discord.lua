@@ -56,12 +56,12 @@ function Damagelog:DiscordMessage(discordUpdate)
         fields = {
             {
                 name = TTTLogTranslate(nil, "Victim") .. ":",
-                value = "[" .. discordUpdate.victim.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.victim.steamID) .. ")",
+                value = "[" .. discordUpdate.victim.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.victim.steamID) .. ")\n" .. discordUpdate.victim.steamID,
                 inline = true
             },
             {
                 name = TTTLogTranslate(nil, "ReportedPlayer") .. ":",
-                value = "[" .. discordUpdate.attacker.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.attacker.steamID) .. ")",
+                value = "[" .. discordUpdate.attacker.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.attacker.steamID) .. ")\n" .. discordUpdate.attacker.steamID,
                 inline = true
             },
             {
