@@ -54,6 +54,9 @@ Damagelog.RDM_Manager_Enabled = true
 Damagelog.RDM_Manager_Command = "!report"
 -- Command to open the respond menu while you're alive
 Damagelog.Respond_Command = "!respond"
+-- True to always respond to reports after death, false to only prompt for round
+-- Recommend to disable if server is utilizing revivable gameplay elements
+Damagelog.AutoRespond = 1
 --[[Set to true if you want to enable MySQL (it needs to be configured on config/mysqloo.lua)
 	Setting it to false will make the logs use SQLite (garrysmod/sv.db)
 ]]
