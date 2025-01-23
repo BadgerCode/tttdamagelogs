@@ -3,12 +3,12 @@ if SERVER then
     --if CR_VERSION then
     Damagelog:EventHook("TTTPlayerRoleChanged")
     Damagelog:EventHook("TTTPlayerRoleChangedByItem")
-    Damagelog:EventHook("TTTPlayerSpawnForRound")
     --elseif TTT2 then
         --TODO
     --else
         --UNUSED
     --end
+    Damagelog:EventHook("PlayerSpawn")
 else
     Damagelog:AddFilter("filter_show_roles", DAMAGELOG_FILTER_BOOL, true)
     Damagelog:AddColor("color_roles", Color(128, 64, 0))
@@ -37,7 +37,7 @@ function event:TTTPlayerRoleChangedByItem(ply, tgt, item)
     })
 end
 
-function event:TTTPlayerSpawnForRound(ply, deadOnly)
+function event:PlayerSpawn(ply)
     self.CallEvent({
         [1] = 3,
         [2] = ply:GetDamagelogID(),
