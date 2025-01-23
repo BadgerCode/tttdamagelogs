@@ -23,6 +23,16 @@ Damagelog.ReportsQueue = Damagelog.ReportsQueue or {}
 
 local renderedReports = {}
 
+local function ActiveReports()
+    local found = 0
+    for _, v in pairs(Damagelog.ReportsQueue) do
+        if not v.finished then
+            found = found + 1
+        end
+    end
+    return found
+end
+
 local function MarkReportAsRendered(report)
     renderedReports[string.format("%s:%s", tostring(report.index), tostring(report.previous or "nil"))] = true
 end
@@ -33,6 +43,49 @@ end
 
 local ReportFrame
 
+local PromptFrame
+
+local PromptClosed = 0
+
+local function BuildPromptFrame()
+    local w, h = 300, 180
+
+    PromptFrame = vgui.Create("DFrame")
+    PromptFrame:SetSize(w, h)
+    PromptFrame:Center()
+    PromptFrame:SetTitle("")
+    PromptFrame:SetVisible(true)
+    PromptFrame:SetMouseInputEnabled(true)
+
+    local inner = vgui.Create("DPanel", PromptFrame)
+    inner:StretchToParent(5, 25, 5, 45)
+
+    local text = vgui.Create("DLabel", inner)
+    text:SetWrap(true)
+    text:SetText(string.format(TTTLogTranslate(GetDMGLogLang, "prompt_text"), ActiveReports()))
+    text:SetDark(true)
+    text:StretchToParent(10, 5, 10, 5)
+
+    local bw, bh = 75, 25
+    local cancel = vgui.Create("DButton", PromptFrame)
+    cancel:SetPos(5, h - 40)
+    cancel:SetSize(125, bh)
+    cancel:SetText(TTTLogTranslate(GetDMGLogLang, "prompt_answer"))
+    cancel.DoClick = function()
+        RunConsoleCommand("dmglogs_answerreport")
+        PromptFrame:Close()
+    end
+
+    local disable = vgui.Create("DButton", PromptFrame)
+    disable:SetPos(w - 130, h - 40)
+    disable:SetSize(125, bh)
+    disable:SetText(TTTLogTranslate(GetDMGLogLang, "prompt_ignore"))
+    disable.DoClick = function()
+        PromptClosed = 1
+        PromptFrame:Close()
+    end
+end
+
 local function BuildReportFrame(report)
     if IsValid(ReportFrame) and report then
         if HasReportBeenRendered(report) then
@@ -42,18 +95,8 @@ local function BuildReportFrame(report)
 
         ReportFrame:AddReport(report)
     else
-        local found = false
 
-        for _, v in pairs(Damagelog.ReportsQueue) do
-            if not v.finished then
-                found = true
-                break
-            end
-        end
-
-        if not found then
-            return
-        end
+        if ActiveReports() == 0 then return end
 
         RunConsoleCommand("-voicerecord")
         
@@ -854,7 +897,25 @@ end)
 
 net.Receive("DL_Death", function()
     if not IsValid(ReportFrame) then
+        if IsValid(PromptFrame) then
+            PromptFrame:Close()
+            PromptFrame:Remove()
+        end
         BuildReportFrame()
+    end
+end)
+
+net.Receive("DL_Prompt", function()
+    if ActiveReports() == 0 then return end
+    if not IsValid(PromptFrame) or PromptClosed == 0 then
+        BuildPromptFrame()
+    end
+end)
+
+net.Receive("DL_Respawn", function()
+    if IsValid(PromptFrame) then
+        PromptFrame:Close()
+        PromptFrame:Remove()
     end
 end)
 

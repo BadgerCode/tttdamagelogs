@@ -413,5 +413,11 @@ DamagelogLang.english = {
 
     role_change = "%s [%s] has changed into [%s]",
     role_item = "%s [%s] used %s on %s [%s]",
-    revive = "%s [%s] has been revived"
+    revive = "%s [%s] has been revived",
+
+    prompt_text = [[You currently have %s unanswered reports,
+    
+You may respond to them now or wait up until the end of the current round.]],
+    prompt_answer = "Answer Reports Now",
+    prompt_ignore = "Don't Remind Me"
 }
