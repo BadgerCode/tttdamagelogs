@@ -45,9 +45,15 @@ local ReportFrame
 
 local PromptFrame
 
-local PromptClosed = 0
+local PromptMode = -1
 
 local function BuildPromptFrame()
+    if PromptMode == 1 then return end
+    if IsValid(PromptFrame) then 
+        PromptFrame:UpdateCount()
+        return
+    end
+
     local w, h = 300, 180
 
     PromptFrame = vgui.Create("DFrame")
@@ -81,8 +87,12 @@ local function BuildPromptFrame()
     disable:SetSize(125, bh)
     disable:SetText(TTTLogTranslate(GetDMGLogLang, "prompt_ignore"))
     disable.DoClick = function()
-        PromptClosed = 1
+        PromptMode = 1
         PromptFrame:Close()
+    end
+
+    PromptFrame.UpdateCount = function(PromptFrame)
+        text:SetText(string.format(TTTLogTranslate(GetDMGLogLang, "prompt_text"), ActiveReports()))
     end
 end
 
@@ -890,6 +900,10 @@ net.Receive("DL_SendReport", function()
         local client = LocalPlayer()
 
         if not client.IsActive or not client:IsActive() then
+            if PromptMode ~= -1 then
+                BuildPromptFrame()
+                return
+            end
             BuildReportFrame(report)
         end
     end
@@ -906,8 +920,9 @@ net.Receive("DL_Death", function()
 end)
 
 net.Receive("DL_Prompt", function()
+    if PromptMode == -1 then PromptMode = 0 end
     if ActiveReports() == 0 then return end
-    if not IsValid(PromptFrame) or PromptClosed == 0 then
+    if not IsValid(PromptFrame) then
         BuildPromptFrame()
     end
 end)
