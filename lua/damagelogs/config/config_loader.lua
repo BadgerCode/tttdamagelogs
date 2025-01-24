@@ -29,7 +29,7 @@ function Damagelog:getConfig()
     config.Commands = {}
     config.Commands.RDM_Manager_Command = Damagelog.RDM_Manager_Command
     config.Commands.Respond_Command = Damagelog.Respond_Command
-
+    config.AutoRespond = Damagelog.AutoRespond
     config.Use_MySQL = Damagelog.Use_MySQL
     --Autoslay stuff
     config.Autoslay = {}
@@ -126,6 +126,7 @@ function Damagelog:loadConfigFromTable(loaded_config)
     Damagelog.RDM_Manager_Enabled = config.RDM_Manager_Enabled
     Damagelog.RDM_Manager_Command = config.Commands.RDM_Manager_Command
     Damagelog.Respond_Command = config.Commands.Respond_Command
+    Damagelog.AutoRespond = config.AutoRespond
     Damagelog.Use_MySQL = Damagelog.Use_MySQL
     
     Damagelog.ShowRemainingSlays = config.Autoslay.ShowRemainingSlays

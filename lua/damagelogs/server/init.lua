@@ -81,6 +81,7 @@ Damagelog.OldTables = Damagelog.OldTables or {}
 Damagelog.ShootTables = Damagelog.ShootTables or {}
 Damagelog.Roles = Damagelog.Roles or {}
 Damagelog.SceneRounds = Damagelog.SceneRounds or {}
+local RecentRoles = {}
 
 net.Receive("DL_SendLang", function(_, ply)
     ply.DMGLogLang = net.ReadString()
@@ -101,13 +102,16 @@ function Player:SetDamagelogID(id)
 end
 
 function Player:AddToDamagelogRoles(joinedAfterRoundStart)
-    local id = table.insert(Damagelog.Roles[#Damagelog.Roles], {
+    local info = {
         role = (joinedAfterRoundStart and DAMAGELOG_ROLE_JOINAFTERROUNDSTART)
             or (self:IsSpec() and DAMAGELOG_ROLE_SPECTATOR)
             or self:GetRole(),
         steamid64 = self:SteamID64(),
         nick = self:Nick()
-    })
+    }
+
+    local id = table.insert(Damagelog.Roles[#Damagelog.Roles], info)
+    if joinedAfterRoundStart then table.insert(RecentRoles[#Damagelog.Roles], id, info) end
 
     self:SetDamagelogID(id)
 end
@@ -152,6 +156,7 @@ function Damagelog:TTTBeginRound()
         end
 
         self.CurrentRound = rounds + 1
+        RecentRoles = self.Roles[rounds + 1]
     end
 
     table.Empty(self.DamageTable)
@@ -360,8 +365,16 @@ hook.Add("PlayerDeath", "Damagelog_PlayerDeathLastLogs", function(ply)
 
     ply.DeathDmgLog = {
         logs = table.Reverse(found_dmg),
-        roles = Damagelog.Roles[#Damagelog.Roles]
+        roles = RecentRoles
     }
 end)
 
+function Damagelog:UpdateRecentRole(ply, role)
+    if GetRoundState() ~= ROUND_ACTIVE then return end
+    local round = self.CurrentRound
 
+    timer.Simple(10, function()
+        if round ~= self.CurrentRound then return end
+        RecentRoles[ply:GetDamagelogID()]["role"] = role
+    end)
+end

@@ -15,6 +15,8 @@ util.AddNetworkString("DL_SendReport")
 util.AddNetworkString("DL_SendAnswer")
 util.AddNetworkString("DL_SendForgive")
 util.AddNetworkString("DL_GetForgive")
+util.AddNetworkString("DL_Prompt")
+util.AddNetworkString("DL_Respawn")
 util.AddNetworkString("DL_Death")
 util.AddNetworkString("DL_Answering")
 util.AddNetworkString("DL_Answering_global")
@@ -679,13 +681,27 @@ hook_Add("PlayerInitialSpawn", "PlayerInitialSpawn_RDM_Manager", function(ply)
 end)
 
 hook_Add("PlayerDeath", "RDM_Manager", function(ply)
-    net.Start("DL_Death")
+    if Damagelog.AutoRespond == 0 then
+        net.Start("DL_Prompt")
+    else
+        net.Start("DL_Death")
+    end
+    net.Send(ply)
+end)
+
+hook_Add("PlayerSpawn", "RDM_Manager", function(ply)
+    net.Start("DL_Respawn")
     net.Send(ply)
 end)
 
 hook_Add("TTTEndRound", "RDM_Manager", function()
     net.Start("DL_Death")
     net.Broadcast()
+end)
+
+concommand.Add("dmglogs_answerreport", function(ply, cmd, args)
+    net.Start("DL_Death")
+    net.Send(ply)
 end)
 
 function HandleReportedPlayerAnswer(ply, previous, text, index)

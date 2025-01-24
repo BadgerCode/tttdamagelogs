@@ -147,13 +147,15 @@ function Damagelog:AddLogsLine(listview, tbl, roles, nofilters, old)
         end
     end
 
+    local color = infos:GetColor(tbl.infos, roles)
+
     function item:PaintOver(w, h)
         if not self:IsSelected() and infos:Highlight(item, tbl.infos, text) then
             surface.SetDrawColor(color_what)
             surface.DrawRect(0, 0, w, h)
         else
             for _, v in pairs(item.Columns) do
-                v:SetTextColor(infos:GetColor(tbl.infos, roles))
+                v:SetTextColor(color)
             end
         end
     end
@@ -170,12 +172,17 @@ function Damagelog:SetListViewTable(listview, tbl, nofilters, old)
 
     if #tbl.logs > 0 then
         local added = false
-
+        local roles = tbl.roles
         for _, v in ipairs(tbl.logs) do
-            local line_added = self:AddLogsLine(listview, v, tbl.roles, nofilters, old)
+            local line_added = self:AddLogsLine(listview, v, roles, nofilters, old)
 
             if not added and line_added then
                 added = true
+            end
+
+            if (CR_VERSION or TTT2) and Damagelog:CheckRoleUpdates(v) then
+                local infos = v["infos"]
+                roles[infos[2]]["role"] = infos[4] 
             end
         end
 
@@ -185,6 +192,13 @@ function Damagelog:SetListViewTable(listview, tbl, nofilters, old)
     else
         listview:AddLine("", "", TTTLogTranslate(GetDMGLogLang, "EmptyLogs"))
     end
+end
+
+function Damagelog:CheckRoleUpdates(tbl)
+    if self.events[tbl.id]["Type"] == "ROLE" and tbl.infos[1] == 1 then
+        return true
+    end
+    return false
 end
 
 function Damagelog:SetRolesListView(listview, tbl)
