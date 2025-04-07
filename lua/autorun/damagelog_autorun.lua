@@ -21,6 +21,27 @@ if SERVER then
 else
     include("damagelogs/client/init.lua")
 end
+
+local discordUpdate = {
+    reportId = "69",
+    round = Damagelog.CurrentRound or 0,
+    victim = {
+        nick = "Maffin",
+        steamID = "69420"
+    },
+    attacker = {
+        nick = "Mauz",
+        steamID = "42069"
+    },
+    adminOnline = 1,
+    reportMessage = "Mauz ist böse :(",
+    responseMessage = nil,
+    reportForgiven = nil,
+    reportHandled = nil
+}
+
+Damagelog:DiscordMessage(discordUpdate)
+
 -- else
 -- print("Gamemode is not TTT")
 -- end

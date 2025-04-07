@@ -4,42 +4,50 @@ local POST_MODES = {
     ALWAYS = 2
 }
 
-local HTTP = HTTP
-local url = CreateConVar("ttt_dmglogs_discordurl", "", FCVAR_PROTECTED + FCVAR_LUA_SERVER, "TTTDamagelogs - Discord Webhook URL")
+local conVarUrl = CreateConVar("ttt_dmglogs_discordurl", "", FCVAR_PROTECTED + FCVAR_LUA_SERVER, "TTTDamagelogs - Discord Webhook URL")
+local url = Damagelog.DiscordWebhookURL 
 local disabled = Damagelog.DiscordWebhookMode == POST_MODES.DISABLED
 local emitOnlyWhenAdminsOffline = Damagelog.DiscordWebhookMode == POST_MODES.WHEN_ADMINS_OFFLINE
 local limit = 5
 local reset = 0
 
-local use_chttp = pcall(require, "chttp")
-if use_chttp then
-    HTTP = CHTTP
-end
-
 local function SendDiscordMessage(embed)
-    local now = os.time(os.date("!*t"))
+    if not url or url == "" then
+        url = conVarUrl:GetString()
+    end
+    print(url)
+    local now = os.time()
 
     if limit == 0 and now < reset then
-        local function tcb()
+        timer.Simple(reset - now, function()
             SendDiscordMessage(embed)
-        end
-
-        timer.Simple(reset - now, tcb)
+        end)
+        return
     end
 
-    local function successCallback(status, body, headers)
-        limit = headers["X-RateLimit-Remaining"]
-        reset = headers["X-RateLimit-Reset"]
-    end
+    local jsonPayload = util.TableToJSON({ embeds = { embed } })
 
     HTTP({
+        url = url,
         method = "POST",
-        url = url:GetString(),
-        body = util.TableToJSON({
-            embeds = {embed}
-        }),
-        type = "application/json",
-        success = successCallback
+        headers = {
+            ["Content-Type"] = "application/json",
+            ["User-Agent"] = "Mozilla/5.0 (GMod Lua)"
+        },
+        body = jsonPayload,
+        success = function(code, body, headers)
+            if code == 200 or code == 204 then
+                limit = tonumber(headers["X-RateLimit-Remaining"]) or limit
+                reset = tonumber(headers["X-RateLimit-Reset"]) or reset
+            else
+                print("[Damagelog] Failed to send Discord message: " .. tostring(code))
+                PrintTable(headers)
+                print(body)
+            end
+        end,
+        failed = function(error)
+            print("[Damagelog] HTTP error: " .. tostring(error))
+        end
     })
 end
 
