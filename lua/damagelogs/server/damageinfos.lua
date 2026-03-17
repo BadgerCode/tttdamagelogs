@@ -56,14 +56,33 @@ function Damagelog:shootCallback(weapon)
     end
 end
 
+function IsBasedOn(gun, targetBase)
+    local current = gun:GetTable()
+    local visited = {}
+
+    while current and current.Base do
+        if current.Base == targetBase then
+            return true
+        end
+
+        -- Prevent infinite loops in broken base chains
+        if visited[current.Base] then break end
+        visited[current.Base] = true
+
+        current = weapons.GetStored(current.Base)
+    end
+
+    return false
+end
+
 hook.Add("EntityFireBullets", "BulletsCallback_DamagelogInfos", function(ent, data)
     if not IsValid(ent) or not ent:IsPlayer() then
         return
     end
 
     local wep = ent:GetActiveWeapon()
-
-    if IsValid(wep) and wep.Base == "weapon_tttbase" then
+    
+    if IsValid(wep) and IsBasedOn(wep, "weapon_tttbase") then
         Damagelog:shootCallback(wep)
     end
 end)
