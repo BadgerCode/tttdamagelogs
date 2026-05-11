@@ -6,6 +6,7 @@ local POST_MODES = {
 
 local HTTP = HTTP
 local url = CreateConVar("ttt_dmglogs_discordurl", "", FCVAR_PROTECTED + FCVAR_LUA_SERVER, "TTTDamagelogs - Discord Webhook URL")
+local steamconnectUrl = CreateConVar("ttt_dmglogs_steamconnect_url", "", FCVAR_PROTECTED + FCVAR_LUA_SERVER, "TTTDamagelogs - Steam connect URL template. Use %ip% and %port% as placeholders.")
 local disabled = Damagelog.DiscordWebhookMode == POST_MODES.DISABLED
 local emitOnlyWhenAdminsOffline = Damagelog.DiscordWebhookMode == POST_MODES.WHEN_ADMINS_OFFLINE
 local limit = 5
@@ -49,28 +50,47 @@ function Damagelog:DiscordMessage(discordUpdate)
         return
     end
 
+    local serverField = nil
+    local baseUrl = steamconnectUrl:GetString()
+    if baseUrl ~= "" then
+        local serverIP = game.GetIPAddress() or ""
+        local ip, port = serverIP:match("([^:]+):(.+)")
+        if ip and port then
+            local joinLink = baseUrl:gsub("%%ip%%", ip):gsub("%%port%%", port)
+            serverField = {
+                name = "Server",
+                value = "[Click here to join](" .. joinLink .. ")",
+                inline = false
+            }
+        end
+    end
+
     local data = {
         title = TTTLogTranslate(nil, "webhook_header_report_submitted"):format(discordUpdate.reportId),
         description = TTTLogTranslate(nil, "webhook_ServerInfo"):format(game.GetMap(), discordUpdate.round),
         timestamp = os.date("!%Y-%m-%dT%H:%M:%S.000Z"),
-        fields = {
-            {
-                name = TTTLogTranslate(nil, "Victim") .. ":",
-                value = "[" .. discordUpdate.victim.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.victim.steamID) .. ")\n" .. discordUpdate.victim.steamID,
-                inline = true
-            },
-            {
-                name = TTTLogTranslate(nil, "ReportedPlayer") .. ":",
-                value = "[" .. discordUpdate.attacker.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.attacker.steamID) .. ")\n" .. discordUpdate.attacker.steamID,
-                inline = true
-            },
-            {
-                name = TTTLogTranslate(nil, "VictimsReport") .. ":",
-                value = discordUpdate.reportMessage:gsub("([%*_~<>\\@[])", "\\%1")
-            }
-        },
+        fields = {},
         color = 0xffff00
     }
+
+    if serverField then
+        table.insert(data.fields, serverField)
+    end
+
+    table.insert(data.fields, {
+        name = TTTLogTranslate(nil, "Victim") .. ":",
+        value = "[" .. discordUpdate.victim.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.victim.steamID) .. ")\n" .. discordUpdate.victim.steamID,
+        inline = true
+    })
+    table.insert(data.fields, {
+        name = TTTLogTranslate(nil, "ReportedPlayer") .. ":",
+        value = "[" .. discordUpdate.attacker.nick:gsub("([%*_~<>\\@%]])", "\\%1") .. "](https://steamcommunity.com/profiles/" .. util.SteamIDTo64(discordUpdate.attacker.steamID) .. ")\n" .. discordUpdate.attacker.steamID,
+        inline = true
+    })
+    table.insert(data.fields, {
+        name = TTTLogTranslate(nil, "VictimsReport") .. ":",
+        value = discordUpdate.reportMessage:gsub("([%*_~<>\\@[])", "\\%1")
+    })
 
 
     if discordUpdate.responseMessage ~= nil then
