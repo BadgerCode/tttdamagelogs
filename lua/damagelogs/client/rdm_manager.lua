@@ -23,6 +23,16 @@ Damagelog.ReportsQueue = Damagelog.ReportsQueue or {}
 
 local renderedReports = {}
 
+local function ActiveReports()
+    local found = 0
+    for _, v in pairs(Damagelog.ReportsQueue) do
+        if not v.finished then
+            found = found + 1
+        end
+    end
+    return found
+end
+
 local function MarkReportAsRendered(report)
     renderedReports[string.format("%s:%s", tostring(report.index), tostring(report.previous or "nil"))] = true
 end
@@ -42,18 +52,8 @@ local function BuildReportFrame(report)
 
         ReportFrame:AddReport(report)
     else
-        local found = false
 
-        for _, v in pairs(Damagelog.ReportsQueue) do
-            if not v.finished then
-                found = true
-                break
-            end
-        end
-
-        if not found then
-            return
-        end
+        if ActiveReports() == 0 then return end
 
         RunConsoleCommand("-voicerecord")
         
@@ -102,7 +102,15 @@ local function BuildReportFrame(report)
             local TextEntry = vgui.Create("DTextEntry")
             TextEntry:SetMultiline(true)
             TextEntry:SetHeight(150)
+            if report.savedresponse then TextEntry:SetText(report.savedresponse) end
             PanelList:AddItem(TextEntry)
+
+            TextEntry.OnLoseFocus = function()
+                if not report.finished then
+                    report.savedresponse = string.Trim(TextEntry:GetValue())
+                end
+            end
+
             local Button = vgui.Create("DButton")
             Button:SetText(TTTLogTranslate(GetDMGLogLang, "Send"))
 
@@ -853,8 +861,18 @@ net.Receive("DL_SendReport", function()
 end)
 
 net.Receive("DL_Death", function()
-    if not IsValid(ReportFrame) then
-        BuildReportFrame()
+    local forced = net.ReadBool()
+    if not forced and ActiveReports() > 0 then
+        chat.AddText(Color(255, 62, 62), net.ReadString(), color_white, " " .. string.format(TTTLogTranslate(GetDMGLogLang, "delayed_text"), ActiveReports(), Damagelog.Respond_Command) )
+        return
+    end
+    BuildReportFrame()
+end)
+
+net.Receive("DL_Respawn", function()
+    if IsValid(ReportFrame) then
+        ReportFrame:Close()
+        ReportFrame:Remove()
     end
 end)
 

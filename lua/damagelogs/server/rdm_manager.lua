@@ -15,6 +15,7 @@ util.AddNetworkString("DL_SendReport")
 util.AddNetworkString("DL_SendAnswer")
 util.AddNetworkString("DL_SendForgive")
 util.AddNetworkString("DL_GetForgive")
+util.AddNetworkString("DL_Respawn")
 util.AddNetworkString("DL_Death")
 util.AddNetworkString("DL_Answering")
 util.AddNetworkString("DL_Answering_global")
@@ -153,6 +154,7 @@ hook_Add("PlayerSay", "Damagelog_RDMManager", function(ply, text, teamOnly)
             return false
         elseif Damagelog.Respond_Command and string_Left(string_lower(text), #Damagelog.Respond_Command) == Damagelog.Respond_Command then
             net.Start("DL_Death")
+            net.WriteBool(true)
             net.Send(ply)
 
             return false
@@ -436,6 +438,7 @@ function HandlePlayerReport(ply, attacker, message, reportType)
 
     if reportType == DAMAGELOG_REPORT_FORCE and attacker:IsActive() then
         net.Start("DL_Death")
+        net.WriteBool(true)
         net.Send(attacker)
     end
 
@@ -680,12 +683,26 @@ end)
 
 hook_Add("PlayerDeath", "RDM_Manager", function(ply)
     net.Start("DL_Death")
+    net.WriteBool(Damagelog.AutoRespond)
+    net.Send(ply)
+end)
+
+hook_Add("PlayerSpawn", "RDM_Manager", function(ply)
+    if GetRoundState() != ROUND_ACTIVE then return end
+    net.Start("DL_Respawn")
     net.Send(ply)
 end)
 
 hook_Add("TTTEndRound", "RDM_Manager", function()
     net.Start("DL_Death")
+    net.WriteBool(true)
     net.Broadcast()
+end)
+
+concommand.Add("dmglogs_answerreport", function(ply, cmd, args)
+    net.Start("DL_Death")
+    net.WriteBool(true)
+    net.Send(ply)
 end)
 
 function HandleReportedPlayerAnswer(ply, previous, text, index)
@@ -866,6 +883,7 @@ net.Receive("DL_ForceRespond", function(_len, ply)
 
         if IsValid(attacker) then
             net.Start("DL_Death")
+            net.WriteBool(true)
             net.Send(attacker)
         end
     end
